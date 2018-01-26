@@ -24,7 +24,7 @@
       "no-template-curly-in-string": "error",
       "no-console": "off",
       "no-undefined": "off",
-      "indent": ["error", 2],
+      "indent": ["error", 4],
       "quotes": ["warn", "single", {"allowTemplateLiterals": true}],
       "no-multi-spaces": ["warn", {"exceptions": { "VariableDeclarator": true }}],
       "no-trailing-spaces": "warn",
