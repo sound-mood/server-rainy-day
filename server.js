@@ -15,11 +15,33 @@ app.use(cors());
 
 app.get('/test', (req, res) => res.send('hello world'));
 
-
 app.get('/api/v1/songs', (req, res) => {
     console.log('get songs from api');
     client.query(`SELECT * FROM songs;`)
         .then(results => {
+            res.send(results.rows);
+        })
+        .catch(err => {
+            console.error('get error', err);
+        })
+})
+
+app.get('/api/v1/ambiance', (req, res) => {
+    console.log('get ambiance from api');
+    client.query(`SELECT * FROM ambiance;`)
+        .then(results => {
+            res.send(results.rows);
+        })
+        .catch(err => {
+            console.error('get error', err);
+        })
+})
+
+app.get('/api/v1/videos', (req, res) => {
+    console.log('get videos from api');
+    client.query(`SELECT * FROM videos;`)
+        .then(results => {
+            console.log(results);
             res.send(results.rows);
         })
         .catch(err => {
