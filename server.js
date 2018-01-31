@@ -51,10 +51,11 @@ app.get('/api/v1/videos', (req, res) => {
         })
 })
 
-//createVideosTable();
-//createAmbianceTable();
+createUserTable();
 createPlaylistTable();
 createSongsTable();
+createVideosTable();
+createAmbianceTable();
 
 function loadSongs() {
     fs.readFile('../client-rainy-day/data/songs.json', (err, fd) => {
@@ -67,6 +68,33 @@ function loadSongs() {
         })
     })
 }
+
+function loadUsers() {
+    fs.readFile('../client-rainy-day/data/users.json', (err, fd) => {
+        JSON.parse(fd.toString()).forEach(ele => {
+            client.query(
+                'INSERT INTO users(name) VALUES($1) ON CONFLICT DO NOTHING',
+                [ele.name]
+            )
+                .catch(console.error);
+        })
+    })
+}
+
+function createUserTable() {
+    client.query(`
+    CREATE TABLE IF NOT EXISTS users(
+        user_id SERIAL PRIMARY KEY,
+        name VARCHAR(30)
+    );`
+    )
+        .then(function(response){
+            console.log('created user table in db!');
+        })
+        .then(loadUsers)
+    }
+    
+    
 
 function createSongsTable() {
     client.query(`
@@ -102,7 +130,7 @@ function createVideosTable() {
       video_id SERIAL PRIMARY KEY,
       name VARCHAR(30),
       URI VARCHAR(15),
-      user_id 
+      user_id INTEGER REFERENCES users(user_id)
     );`
     )
         .then(function (response) {
@@ -129,7 +157,7 @@ function createAmbianceTable() {
       ambiance_id SERIAL PRIMARY KEY,
       name VARCHAR(30),
       URI VARCHAR(15),
-      user_id INTEGER
+      user_id INTEGER REFERENCES users(user_id)
     );`
     )
         .then(function (response) {
@@ -142,8 +170,8 @@ function loadPlaylist() {
     fs.readFile('../client-rainy-day/data/playlist.json', (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
-                'INSERT INTO playlist(name, ambiance_id, video_id, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-                [ele.name, ele.URI, ele.ambiance_id, ele.video_id, ele.user_id]
+                'INSERT INTO playlists(name, ambiance_id, video_id, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+                [ele.name, ele.ambiance_id, ele.video_id, ele.user_id]
             )
                 .catch(console.error);
         })
@@ -157,7 +185,7 @@ function createPlaylistTable() {
       name VARCHAR(30),
       ambiance_id INTEGER,
       video_id INTEGER,
-      user_id INTEGER
+      user_id INTEGER REFERENCES users(user_id)
     );`
     )
         .then(function (response) {
