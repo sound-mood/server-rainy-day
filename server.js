@@ -51,17 +51,17 @@ app.get('/api/v1/videos', (req, res) => {
         })
 })
 
-// createSongsTable();
-// createVideosTable();
-// createAmbianceTable();
-// createPlaylistTable();
+//createVideosTable();
+//createAmbianceTable();
+createPlaylistTable();
+createSongsTable();
 
 function loadSongs() {
     fs.readFile('../client-rainy-day/data/songs.json', (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
-                'INSERT INTO songs(name, artist, URI, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-                [ele.name, ele.artist, ele.URI, ele.user_id]
+                'INSERT INTO songs(name, artist, URI, playlist_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+                [ele.name, ele.artist, ele.URI, ele.playlist_id]
             )
                 .catch(console.error);
         })
@@ -75,7 +75,7 @@ function createSongsTable() {
       name VARCHAR(30),
       artist VARCHAR(20),
       URI VARCHAR(15),
-      user_id INTEGER
+      playlist_id INTEGER REFERENCES playlists(playlist_id)
     );`
     )
         .then(function (response) {
@@ -102,7 +102,7 @@ function createVideosTable() {
       video_id SERIAL PRIMARY KEY,
       name VARCHAR(30),
       URI VARCHAR(15),
-      user_id INTEGER
+      user_id 
     );`
     )
         .then(function (response) {
