@@ -13,8 +13,6 @@ app.use(cors());
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: true }));
 
-// THIS IS A TEST
-
 app.get('/test', (req, res) => res.send('hello world'));
 
 app.get('/api/v1/songs', (req, res) => {
@@ -43,7 +41,17 @@ app.get('/api/v1/videos', (req, res) => {
     console.log('get videos from api');
     client.query(`SELECT * FROM videos;`)
         .then(results => {
-            console.log(results);
+            res.send(results.rows);
+        })
+        .catch(err => {
+            console.error('get error', err);
+        })
+})
+
+app.get('/api/v1/playlists', (req, res) => {
+    console.log('get playlists from api');
+    client.query(`SELECT * FROM playlists;`)
+        .then(results => {
             res.send(results.rows);
         })
         .catch(err => {
@@ -60,8 +68,8 @@ function loadSongs() {
     fs.readFile('../client-rainy-day/data/songs.json', (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
-                'INSERT INTO songs(name, artist, URI, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-                [ele.name, ele.artist, ele.URI, ele.user_id]
+                'INSERT INTO songs(name, artist, URI, playlist_id, user_id) VALUES($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING',
+                [ele.name, ele.artist, ele.URI, ele.playlist_id, ele.user_id]
             )
                 .catch(console.error);
         })
@@ -75,6 +83,7 @@ function createSongsTable() {
       name VARCHAR(30),
       artist VARCHAR(20),
       URI VARCHAR(15),
+      playlist_id INTEGER,
       user_id INTEGER
     );`
     )
@@ -142,8 +151,8 @@ function loadPlaylist() {
     fs.readFile('../client-rainy-day/data/playlist.json', (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
-                'INSERT INTO playlist(name, ambiance_id, video_id, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-                [ele.name, ele.URI, ele.ambiance_id, ele.video_id, ele.user_id]
+                'INSERT INTO playlists(name, ambiance_id, video_id, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+                [ele.name, ele.ambiance_id, ele.video_id, ele.user_id]
             )
                 .catch(console.error);
         })
@@ -161,7 +170,7 @@ function createPlaylistTable() {
     );`
     )
         .then(function (response) {
-            console.log('created ambiance table in db!!!!');
+            console.log('created playlist table in db!!!!');
         })
         .then(loadPlaylist)
 }
