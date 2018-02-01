@@ -3,15 +3,15 @@ const cors = require('cors');
 const fs = require('fs');
 const express = require('express');
 const pg = require('pg');
-// const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const connectionString = 'postgres://localhost:5432/soundmood';
 const client = new pg.Client(connectionString);
 client.connect();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
 
 // THIS IS A TEST
 
@@ -49,6 +49,83 @@ app.get('/api/v1/videos', (req, res) => {
         .catch(err => {
             console.error('get error', err);
         })
+})
+
+app.get('/api/v1/playlists', (req, res) => {
+    console.log('get playlists from api');
+    client.query(`SELECT * FROM playlists;`)
+        .then(results => {
+            console.log(results);
+            res.send(results.rows);
+        })
+        .catch(err => {
+            console.error('get error', err);
+        })
+})
+
+// app.get('/api/v1/users', (req, res) => {
+//     console.log('get users from api');
+//     client.query(`SELECT * FROM users;`)
+//         .then(results => {
+//             console.log(results);
+//             res.send(results.rows);
+//         })
+//         .catch(err => {
+//             console.error('get error', err);
+//         })
+// })
+
+app.post('/api/v1/users', function(req,res) {
+    client.query(`INSERT INTO users(name) VALUES($1);`,
+    [req.body.name],
+    function(err) {
+        if(err) console.error(err);
+        res.send('user added');
+    }
+    )
+})
+
+app.post('/api/v1/playlists', function(req,res) {
+    client.query('INSERT INTO playlists(name) VALUES($1) ON CONFLICT DO NOTHING',
+    [req.body.name],
+    function(err) {
+        if(err) console.error(err);
+        res.send('playlist added');
+    }
+    )
+})
+
+app.post('/api/v1/songs', function(req,res) {
+    client.query(`
+    INSERT INTO songs(name, artist, URI) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+    [req.body.name, req.body.artist, req.body.URI],
+    function(err) {
+        if(err) console.error(err);
+        res.send('song added');
+    }
+)
+})
+
+app.post('/api/v1/videos', function(req,res) {
+    client.query(`
+    INSERT INTO videos(name, URI) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+    [req.body.name, req.body.URI],
+    function(err) {
+        if(err) console.error(err);
+        res.send('video added');
+    }
+)
+})
+
+app.post('/api/v1/ambiance', function(req,res) {
+    client.query(`
+    INSERT INTO ambiance(name, URI) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+    [req.body.name, req.body.URI],
+    function(err) {
+        if(err) console.error(err);
+        res.send(' ambiance added');
+    }
+)
 })
 
 createUserTable();
