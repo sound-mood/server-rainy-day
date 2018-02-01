@@ -75,6 +75,19 @@ app.get('/api/v1/users', (req, res) => {
         })
 })
 
+app.get('/api/v1/users/login', (req, res) => {
+    console.log('get users from api');
+    console.log(req.body.name);
+    client.query(`SELECT * FROM users WHERE NAME = ${req.body.name};`)
+        .then(results => {
+            console.log(results);
+            res.send(results.rows);
+        })
+        .catch(err => {
+            console.error('get error', err);
+        })
+})
+
 app.post('/api/v1/users', function(req,res) {
     client.query(`INSERT INTO users(name) VALUES($1);`,
     [req.body.name],
