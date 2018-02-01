@@ -63,17 +63,17 @@ app.get('/api/v1/playlists', (req, res) => {
         })
 })
 
-// app.get('/api/v1/users', (req, res) => {
-//     console.log('get users from api');
-//     client.query(`SELECT * FROM users;`)
-//         .then(results => {
-//             console.log(results);
-//             res.send(results.rows);
-//         })
-//         .catch(err => {
-//             console.error('get error', err);
-//         })
-// })
+app.get('/api/v1/users', (req, res) => {
+    console.log('get users from api');
+    client.query(`SELECT * FROM users;`)
+        .then(results => {
+            console.log(results);
+            res.send(results.rows);
+        })
+        .catch(err => {
+            console.error('get error', err);
+        })
+})
 
 app.post('/api/v1/users', function(req,res) {
     client.query(`INSERT INTO users(name) VALUES($1);`,
@@ -119,8 +119,8 @@ app.post('/api/v1/videos', function(req,res) {
 
 app.post('/api/v1/ambiance', function(req,res) {
     client.query(`
-    INSERT INTO ambiance(name, URI) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-    [req.body.name, req.body.URI],
+    INSERT INTO ambiance(name, URI, user_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+    [req.body.name, req.body.URI, req.body.user_id],
     function(err) {
         if(err) console.error(err);
         res.send(' ambiance added');
@@ -162,7 +162,7 @@ function createUserTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS users(
         user_id SERIAL PRIMARY KEY,
-        name VARCHAR(30)
+        name VARCHAR(30) UNIQUE
     );`
     )
         .then(function(response){
