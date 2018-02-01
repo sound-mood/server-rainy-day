@@ -179,7 +179,7 @@ function createSongsTable() {
       song_id SERIAL PRIMARY KEY,
       name VARCHAR(30),
       artist VARCHAR(20),
-      URI VARCHAR(15),
+      URI VARCHAR(30),
       playlist_id INTEGER REFERENCES playlists(playlist_id)
     );`
     )
@@ -206,7 +206,7 @@ function createVideosTable() {
     CREATE TABLE IF NOT EXISTS videos(
       video_id SERIAL PRIMARY KEY,
       name VARCHAR(30),
-      URI VARCHAR(15),
+      URI VARCHAR(30),
       user_id INTEGER REFERENCES users(user_id)
     );`
     )
@@ -233,7 +233,7 @@ function createAmbianceTable() {
     CREATE TABLE IF NOT EXISTS ambiance(
       ambiance_id SERIAL PRIMARY KEY,
       name VARCHAR(30),
-      URI VARCHAR(15),
+      URI VARCHAR(60),
       user_id INTEGER REFERENCES users(user_id)
     );`
     )
