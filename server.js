@@ -170,7 +170,7 @@ function createUserTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS users(
         user_id SERIAL PRIMARY KEY,
-        name VARCHAR(30) UNIQUE
+        name VARCHAR(40) UNIQUE
     );`
     )
         .then(function (response) {
@@ -185,9 +185,9 @@ function createSongsTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS songs(
       song_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
-      artist VARCHAR(20),
-      URI VARCHAR(30),
+      name VARCHAR(40),
+      artist VARCHAR(40),
+      URI VARCHAR(40),
       playlist_id INTEGER REFERENCES playlists(playlist_id)
     );`
     )
@@ -213,8 +213,8 @@ function createVideosTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS videos(
       video_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
-      URI VARCHAR(30),
+      name VARCHAR(40),
+      URI VARCHAR(40),
       user_id INTEGER REFERENCES users(user_id)
     );`
     )
@@ -240,7 +240,7 @@ function createAmbianceTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS ambiance(
       ambiance_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
+      name VARCHAR(40),
       URI VARCHAR(60),
       user_id INTEGER REFERENCES users(user_id)
     );`
@@ -267,7 +267,7 @@ function createPlaylistTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS playlists(
       playlist_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
+      name VARCHAR(40),
       ambiance_id INTEGER,
       video_id INTEGER,
       user_id INTEGER REFERENCES users(user_id)
@@ -281,17 +281,13 @@ function createPlaylistTable() {
 
 
 
-app.listen(PORT, () => {
-    console.log(`currently listening on ${PORT}`);
-});
-
 function createSongsTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS songs(
       song_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
-      artist VARCHAR(20),
-      URI VARCHAR(30),
+      name VARCHAR(40),
+      artist VARCHAR(40),
+      URI VARCHAR(40),
       playlist_id INTEGER REFERENCES playlists(playlist_id)
     );`
     )
@@ -317,8 +313,8 @@ function createVideosTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS videos(
       video_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
-      URI VARCHAR(30),
+      name VARCHAR(40),
+      URI VARCHAR(40),
       user_id INTEGER REFERENCES users(user_id)
     );`
     )
@@ -344,7 +340,7 @@ function createAmbianceTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS ambiance(
       ambiance_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
+      name VARCHAR(40),
       URI VARCHAR(60),
       user_id INTEGER REFERENCES users(user_id)
     );`
@@ -371,7 +367,7 @@ function createPlaylistTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS playlists(
       playlist_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
+      name VARCHAR(40),
       ambiance_id INTEGER,
       video_id INTEGER,
       user_id INTEGER REFERENCES users(user_id)
