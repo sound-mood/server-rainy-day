@@ -3,6 +3,7 @@ const cors = require('cors');
 const fs = require('fs');
 const express = require('express');
 const pg = require('pg');
+const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT;
@@ -155,7 +156,7 @@ createVideosTable();
 createAmbianceTable();
 
 function loadSongs() {
-    fs.readFile('../client-rainy-day/data/songs.json', (err, fd) => {
+    fs.readFile(path.join(__dirname, '../', 'client-rainy-day/data/songs.json'), (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
                 'INSERT INTO songs(name, artist, URI, playlist_id, user_id) VALUES($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING',
@@ -167,7 +168,7 @@ function loadSongs() {
 }
 
 function loadUsers() {
-    fs.readFile('../client-rainy-day/data/users.json', (err, fd) => {
+    fs.readFile(path.join(__dirname, '../', 'client-rainy-day/data/users.json'), (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
                 'INSERT INTO users(name) VALUES($1) ON CONFLICT DO NOTHING',
@@ -211,7 +212,7 @@ function createSongsTable() {
 }
 
 function loadVideos() {
-    fs.readFile('../client-rainy-day/data/videos.json', (err, fd) => {
+    fs.readFile(path.join(__dirname, '../', 'client-rainy-day/data/videos.json'), (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
                 'INSERT INTO videos(name, URI, user_id) VALUES($1, $2, $3) ON CONFLICT DO NOTHING',
@@ -238,7 +239,7 @@ function createVideosTable() {
 }
 
 function loadAmbiance() {
-    fs.readFile('../client-rainy-day/data/ambiance.json', (err, fd) => {
+    fs.readFile(path.join(__dirname, '../', 'client-rainy-day/data/ambiance.json'), (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
                 'INSERT INTO ambiance(name, URI, user_id) VALUES($1, $2, $3) ON CONFLICT DO NOTHING',
@@ -250,7 +251,7 @@ function loadAmbiance() {
 }
 
 function loadPlaylist() {
-    fs.readFile('../client-rainy-day/data/playlist.json', (err, fd) => {
+    fs.readFile(path.join(__dirname, '../', 'client-rainy-day/data/playlist.json'), (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
                 'INSERT INTO playlists(name, ambiance_id, video_id, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
