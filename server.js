@@ -204,6 +204,7 @@ function createSongsTable() {
       URI VARCHAR(40),
       playlist_id INTEGER REFERENCES playlists(playlist_id),
       user_id INTEGER REFERENCES users(user_id)
+      playlist_id INTEGER REFERENCES playlists(playlist_id)
     );`
     )
         .then(function (response) {
@@ -251,8 +252,6 @@ function loadAmbiance() {
     })
 }
 
-
-
 function loadPlaylist() {
     fs.readFile('../client-rainy-day/data/playlist.json', (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
@@ -266,12 +265,6 @@ function loadPlaylist() {
 }
 
 
-
-
-
-
-
-
 function loadVideos() {
     fs.readFile('../client-rainy-day/data/videos.json', (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
@@ -283,7 +276,6 @@ function loadVideos() {
         })
     })
 }
-
 
 
 function loadAmbiance() {
