@@ -108,8 +108,8 @@ app.post('/api/v1/users', function (req, res) {
 })
 
 app.post('/api/v1/playlists', function (req, res) {
-    client.query('INSERT INTO playlists(name) VALUES($1) ON CONFLICT DO NOTHING',
-        [req.body.name],
+    client.query('INSERT INTO playlists(name, user_id) VALUES($1, $2) ON CONFLICT DO NOTHING',
+        [req.body.name, req.body.user_id],
         function (err) {
             if (err) console.error(err);
             res.send('playlist added');
@@ -184,7 +184,7 @@ function createUserTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS users(
         user_id SERIAL PRIMARY KEY,
-        name VARCHAR(30) UNIQUE
+        name VARCHAR(40) UNIQUE
     );`
     )
         .then(function (response) {
@@ -192,108 +192,6 @@ function createUserTable() {
         })
         .then(loadUsers)
 }
-
-
-
-function createSongsTable() {
-    client.query(`
-    CREATE TABLE IF NOT EXISTS songs(
-      song_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
-      artist VARCHAR(20),
-      URI VARCHAR(30),
-      playlist_id INTEGER REFERENCES playlists(playlist_id)
-    );`
-    )
-        .then(function (response) {
-            console.log('created songs table in db!!!!');
-        })
-        .then(loadSongs)
-}
-
-function loadVideos() {
-    fs.readFile('../client-rainy-day/data/videos.json', (err, fd) => {
-        JSON.parse(fd.toString()).forEach(ele => {
-            client.query(
-                'INSERT INTO videos(name, URI, user_id) VALUES($1, $2, $3) ON CONFLICT DO NOTHING',
-                [ele.name, ele.URI, ele.user_id]
-            )
-                .catch(console.error);
-        })
-    })
-}
-
-function createVideosTable() {
-    client.query(`
-    CREATE TABLE IF NOT EXISTS videos(
-      video_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
-      URI VARCHAR(30),
-      user_id INTEGER REFERENCES users(user_id)
-    );`
-    )
-        .then(function (response) {
-            console.log('created video table in db!!!!');
-        })
-        .then(loadVideos)
-}
-
-function loadAmbiance() {
-    fs.readFile('../client-rainy-day/data/ambiance.json', (err, fd) => {
-        JSON.parse(fd.toString()).forEach(ele => {
-            client.query(
-                'INSERT INTO ambiance(name, URI, user_id) VALUES($1, $2, $3) ON CONFLICT DO NOTHING',
-                [ele.name, ele.URI, ele.user_id]
-            )
-                .catch(console.error);
-        })
-    })
-}
-
-function createAmbianceTable() {
-    client.query(`
-    CREATE TABLE IF NOT EXISTS ambiance(
-      ambiance_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
-      URI VARCHAR(60),
-      user_id INTEGER REFERENCES users(user_id)
-    );`
-    )
-        .then(function (response) {
-            console.log('created ambiance table in db!!!!');
-        })
-        .then(loadAmbiance)
-}
-
-function loadPlaylist() {
-    fs.readFile('../client-rainy-day/data/playlist.json', (err, fd) => {
-        JSON.parse(fd.toString()).forEach(ele => {
-            client.query(
-                'INSERT INTO playlists(name, ambiance_id, video_id, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-                [ele.name, ele.ambiance_id, ele.video_id, ele.user_id]
-            )
-                .catch(console.error);
-        })
-    })
-}
-
-function createPlaylistTable() {
-    client.query(`
-    CREATE TABLE IF NOT EXISTS playlists(
-      playlist_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
-      ambiance_id INTEGER,
-      video_id INTEGER,
-      user_id INTEGER REFERENCES users(user_id)
-    );`
-    )
-        .then(function (response) {
-            console.log('created playlist table in db!!!!');
-        })
-        .then(loadPlaylist)
-}
-
-
 
 
 
@@ -330,7 +228,7 @@ function createVideosTable() {
     CREATE TABLE IF NOT EXISTS videos(
       video_id SERIAL PRIMARY KEY,
       name VARCHAR(40),
-      URI VARCHAR(30),
+      URI VARCHAR(40),
       user_id INTEGER REFERENCES users(user_id)
     );`
     )
@@ -339,6 +237,53 @@ function createVideosTable() {
         })
         .then(loadVideos)
 }
+
+function loadAmbiance() {
+    fs.readFile('../client-rainy-day/data/ambiance.json', (err, fd) => {
+        JSON.parse(fd.toString()).forEach(ele => {
+            client.query(
+                'INSERT INTO ambiance(name, URI, user_id) VALUES($1, $2, $3) ON CONFLICT DO NOTHING',
+                [ele.name, ele.URI, ele.user_id]
+            )
+                .catch(console.error);
+        })
+    })
+}
+
+
+
+function loadPlaylist() {
+    fs.readFile('../client-rainy-day/data/playlist.json', (err, fd) => {
+        JSON.parse(fd.toString()).forEach(ele => {
+            client.query(
+                'INSERT INTO playlists(name, ambiance_id, video_id, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
+                [ele.name, ele.ambiance_id, ele.video_id, ele.user_id]
+            )
+                .catch(console.error);
+        })
+    })
+}
+
+
+
+
+
+
+
+
+function loadVideos() {
+    fs.readFile('../client-rainy-day/data/videos.json', (err, fd) => {
+        JSON.parse(fd.toString()).forEach(ele => {
+            client.query(
+                'INSERT INTO videos(name, URI, user_id) VALUES($1, $2, $3) ON CONFLICT DO NOTHING',
+                [ele.name, ele.URI, ele.user_id]
+            )
+                .catch(console.error);
+        })
+    })
+}
+
+
 
 function loadAmbiance() {
     fs.readFile('../client-rainy-day/data/ambiance.json', (err, fd) => {
@@ -383,7 +328,7 @@ function createPlaylistTable() {
     client.query(`
     CREATE TABLE IF NOT EXISTS playlists(
       playlist_id SERIAL PRIMARY KEY,
-      name VARCHAR(30),
+      name VARCHAR(40),
       ambiance_id INTEGER,
       video_id INTEGER,
       user_id INTEGER REFERENCES users(user_id)
