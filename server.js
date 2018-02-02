@@ -6,7 +6,7 @@ const pg = require('pg');
 const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
-const connectionString = 'postgres://localhost:5432/soundmood';
+const connectionString = 'postgres://postgres:10131820ni@localhost:5432/soundmood';
 const client = new pg.Client(connectionString);
 client.connect();
 app.use(bodyParser.json());
@@ -16,7 +16,6 @@ app.use(cors());
 app.get('/test', (req, res) => res.send('hello world'));
 
 app.get('/api/v1/songs', (req, res) => {
-    console.log('get songs from api');
     client.query(`SELECT * FROM songs;`)
         .then(results => {
             res.send(results.rows);
@@ -27,7 +26,6 @@ app.get('/api/v1/songs', (req, res) => {
 })
 
 app.get('/api/v1/ambiance', (req, res) => {
-    console.log('get ambiance from api');
     client.query(`SELECT * FROM ambiance;`)
         .then(results => {
             res.send(results.rows);
@@ -202,9 +200,8 @@ function createSongsTable() {
       name VARCHAR(40),
       artist VARCHAR(40),
       URI VARCHAR(40),
-      playlist_id INTEGER REFERENCES playlists(playlist_id),
+      playlist_id INTEGER REFERENCES playlists(playlist_id),            
       user_id INTEGER REFERENCES users(user_id)
-      playlist_id INTEGER REFERENCES playlists(playlist_id)
     );`
     )
         .then(function (response) {
@@ -265,30 +262,6 @@ function loadPlaylist() {
 }
 
 
-function loadVideos() {
-    fs.readFile('../client-rainy-day/data/videos.json', (err, fd) => {
-        JSON.parse(fd.toString()).forEach(ele => {
-            client.query(
-                'INSERT INTO videos(name, URI, user_id) VALUES($1, $2, $3) ON CONFLICT DO NOTHING',
-                [ele.name, ele.URI, ele.user_id]
-            )
-                .catch(console.error);
-        })
-    })
-}
-
-
-function loadAmbiance() {
-    fs.readFile('../client-rainy-day/data/ambiance.json', (err, fd) => {
-        JSON.parse(fd.toString()).forEach(ele => {
-            client.query(
-                'INSERT INTO ambiance(name, URI, user_id) VALUES($1, $2, $3) ON CONFLICT DO NOTHING',
-                [ele.name, ele.URI, ele.user_id]
-            )
-                .catch(console.error);
-        })
-    })
-}
 
 function createAmbianceTable() {
     client.query(`
@@ -305,17 +278,6 @@ function createAmbianceTable() {
         .then(loadAmbiance)
 }
 
-function loadPlaylist() {
-    fs.readFile('../client-rainy-day/data/playlist.json', (err, fd) => {
-        JSON.parse(fd.toString()).forEach(ele => {
-            client.query(
-                'INSERT INTO playlists(name, ambiance_id, video_id, user_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-                [ele.name, ele.ambiance_id, ele.video_id, ele.user_id]
-            )
-                .catch(console.error);
-        })
-    })
-}
 
 function createPlaylistTable() {
     client.query(`
