@@ -108,8 +108,8 @@ app.post('/api/v1/users', function (req, res) {
 })
 
 app.post('/api/v1/playlists', function (req, res) {
-    client.query('INSERT INTO playlists(name) VALUES($1) ON CONFLICT DO NOTHING',
-        [req.body.name],
+    client.query('INSERT INTO playlists(name, user_id) VALUES($1, $2) ON CONFLICT DO NOTHING',
+        [req.body.name, req.body.user_id],
         function (err) {
             if (err) console.error(err);
             res.send('playlist added');
@@ -119,8 +119,8 @@ app.post('/api/v1/playlists', function (req, res) {
 
 app.post('/api/v1/songs', function (req, res) {
     client.query(`
-    INSERT INTO songs(name, artist, URI) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
-        [req.body.name, req.body.artist, req.body.URI],
+    INSERT INTO songs(name, artist, URI, user_id, playlist_id) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
+        [req.body.name, req.body.artist, req.body.URI, req.body.user_id, req.body.playlist_id],
         function (err) {
             if (err) console.error(err);
             res.send('song added');
@@ -130,8 +130,8 @@ app.post('/api/v1/songs', function (req, res) {
 
 app.post('/api/v1/videos', function (req, res) {
     client.query(`
-    INSERT INTO videos(name, URI) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-        [req.body.name, req.body.URI],
+    INSERT INTO videos(name, URI, user_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+        [req.body.name, req.body.URI, req.body.user_id],
         function (err) {
             if (err) console.error(err);
             res.send('video added');
@@ -160,8 +160,8 @@ function loadSongs() {
     fs.readFile('../client-rainy-day/data/songs.json', (err, fd) => {
         JSON.parse(fd.toString()).forEach(ele => {
             client.query(
-                'INSERT INTO songs(name, artist, URI, playlist_id) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-                [ele.name, ele.artist, ele.URI, ele.playlist_id]
+                'INSERT INTO songs(name, artist, URI, playlist_id, user_id) VALUES($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING',
+                [ele.name, ele.artist, ele.URI, ele.playlist_id, ele.user_id]
             )
                 .catch(console.error);
         })
@@ -202,6 +202,8 @@ function createSongsTable() {
       name VARCHAR(40),
       artist VARCHAR(40),
       URI VARCHAR(40),
+      playlist_id INTEGER REFERENCES playlists(playlist_id),
+      user_id INTEGER REFERENCES users(user_id)
       playlist_id INTEGER REFERENCES playlists(playlist_id)
     );`
     )
@@ -248,21 +250,6 @@ function loadAmbiance() {
                 .catch(console.error);
         })
     })
-}
-
-function createAmbianceTable() {
-    client.query(`
-    CREATE TABLE IF NOT EXISTS ambiance(
-      ambiance_id SERIAL PRIMARY KEY,
-      name VARCHAR(40),
-      URI VARCHAR(60),
-      user_id INTEGER REFERENCES users(user_id)
-    );`
-    )
-        .then(function (response) {
-            console.log('created ambiance table in db!!!!');
-        })
-        .then(loadAmbiance)
 }
 
 function loadPlaylist() {
