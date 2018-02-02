@@ -6,7 +6,7 @@ const pg = require('pg');
 // const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
-const connectionString = 'postgres://postgres:10131820ni@localhost:5432/soundmood';
+const connectionString = 'postgres://postgres:6789@localhost:5432/soundmood';
 const client = new pg.Client(connectionString);
 client.connect();
 app.use(cors());
